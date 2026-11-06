@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Particle Life</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #07070c; color: #ddd; font: 13px system-ui, sans-serif; overflow: hidden; }
+  canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
+  #panel { position: fixed; top: 12px; left: 12px; background: rgba(15,15,25,.82); padding: 10px 12px; border-radius: 10px;
+           border: 1px solid #2a2a3a; max-width: 240px; backdrop-filter: blur(6px); }
+  #panel h1 { font-size: 15px; margin: 0 0 6px; }
+  #panel p { margin: 0 0 8px; color: #999; line-height: 1.35; }
+  button { background: #22223a; color: #eee; border: 1px solid #3a3a5a; border-radius: 6px; padding: 5px 8px; margin: 2px 2px 2px 0; cursor: pointer; }
+  button:hover { background: #2e2e4e; }
+  label { display: block; margin-top: 6px; color: #aaa; }
+  input[type=range] { width: 100%; }
+  #matrix { display: grid; gap: 2px; margin-top: 8px; }
+  #matrix div { width: 100%; aspect-ratio: 1; border-radius: 3px; cursor: pointer; }
+  #hide { position: fixed; top: 12px; right: 12px; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="panel">
+  <h1>Particle Life</h1>
+  <p>Six colors, one rule: each color is attracted to or repelled by the others. Lifelike blobs emerge on their own.</p>
+  <button id="rand">New universe (R)</button>
+  <button id="pause">Pause (Space)</button>
+  <label>Particles <span id="nv"></span><input id="n" type="range" min="300" max="3000" step="100" value="1500"></label>
+  <label>Interaction radius <span id="rv"></span><input id="r" type="range" min="40" max="200" step="5" value="90"></label>
+  <label>Friction <span id="fv"></span><input id="f" type="range" min="0.80" max="0.99" step="0.01" value="0.90"></label>
+  <div id="matrix" title="Rule matrix: row attracts (green) / repels (red) column. Click to cycle."></div>
+  <p style="margin-top:8px">Click or drag on the canvas to stir.</p>
+</div>
+<button id="hide">Hide panel (H)</button>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const COLORS = ['#ff4d6d', '#ffb703', '#8ac926', '#00c2d1', '#6a4cff', '#f15bb5'];
+const K = COLORS.length;
+let W, H, N, R, FRICTION, rules, xs, ys, vxs, vys, types, paused = false;
+let mouse = null;
+
+function resize() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  W = canvas.width = innerWidth * dpr;
+  H = canvas.height = innerHeight * dpr;
+}
+
+function randomRules() {
+  rules = Array.from({ length: K }, () => Array.from({ length: K }, () => +(Math.random() * 2 - 1).toFixed(2)));
+  drawMatrix();
+}
+
+function spawn() {
+  N = +document.getElementById('n').value;
+  xs = new Float32Array(N); ys = new Float32Array(N);
+  vxs = new Float32Array(N); vys = new Float32Array(N);
+  types = new Uint8Array(N);
+  for (let i = 0; i < N; i++) {
+    xs[i] = Math.random() * W; ys[i] = Math.random() * H;
+    types[i] = i % K;
+  }
+}
+
+// Force curve: strong repulsion when very close, then the rule's attraction/repulsion.
+function force(d, a) {
+  const beta = 0.3;
+  if (d < beta) return d / beta - 1;
+  if (d < 1) return a * (1 - Math.abs(2 * d - 1 - beta) / (1 - beta));
+  return 0;
+}
+
+// Spatial grid so each particle only checks nearby neighbours.
+function step() {
+  const cell = R, cols = Math.ceil(W / cell), rows = Math.ceil(H / cell);
+  const head = new Int32Array(cols * rows).fill(-1), next = new Int32Array(N);
+  for (let i = 0; i < N; i++) {
+    const c = ((xs[i] / cell) | 0) + ((ys[i] / cell) | 0) * cols;
+    next[i] = head[c]; head[c] = i;
+  }
+  const strength = R * 0.6;
+  for (let i = 0; i < N; i++) {
+    let fx = 0, fy = 0;
+    const cx = (xs[i] / cell) | 0, cy = (ys[i] / cell) | 0, ti = types[i], row = rules[ti];
+    for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) {
+      const gx = (cx + ox + cols) % cols, gy = (cy + oy + rows) % rows;
+      for (let j = head[gx + gy * cols]; j !== -1; j = next[j]) {
+        if (j === i) continue;
+        let dx = xs[j] - xs[i], dy = ys[j] - ys[i];
+        if (dx > W / 2) dx -= W; else if (dx < -W / 2) dx += W;   // wrap-around world
+        if (dy > H / 2) dy -= H; else if (dy < -H / 2) dy += H;
+        const d2 = dx * dx + dy * dy;
+        if (d2 > 0 && d2 < R * R) {
+          const d = Math.sqrt(d2), f = force(d / R, row[types[j]]);
+          fx += dx / d * f; fy += dy / d * f;
+        }
+      }
+    }
+    if (mouse) {
+      const dx = xs[i] - mouse.x, dy = ys[i] - mouse.y, d2 = dx * dx + dy * dy;
+      if (d2 < 150 * 150 && d2 > 1) { const d = Math.sqrt(d2); fx += dx / d * 3; fy += dy / d * 3; }
+    }
+    vxs[i] = vxs[i] * FRICTION + fx * strength * 0.01;
+    vys[i] = vys[i] * FRICTION + fy * strength * 0.01;
+  }
+  for (let i = 0; i < N; i++) {
+    xs[i] = (xs[i] + vxs[i] + W) % W;
+    ys[i] = (ys[i] + vys[i] + H) % H;
+  }
+}
+
+function draw() {
+  ctx.fillStyle = 'rgba(7,7,12,0.35)';  // slight trails
+  ctx.fillRect(0, 0, W, H);
+  const size = Math.max(2, W / 700);
+  for (let t = 0; t < K; t++) {
+    ctx.fillStyle = COLORS[t];
+    ctx.beginPath();
+    for (let i = t; i < N; i += K) ctx.rect(xs[i], ys[i], size, size);
+    ctx.fill();
+  }
+}
+
+function loop() {
+  if (!paused) step();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+function drawMatrix() {
+  const m = document.getElementById('matrix');
+  m.style.gridTemplateColumns = `repeat(${K + 1}, 1fr)`;
+  m.innerHTML = '';
+  m.appendChild(document.createElement('div'));
+  for (let c = 0; c < K; c++) { const d = document.createElement('div'); d.style.background = COLORS[c]; d.style.borderRadius = '50%'; m.appendChild(d); }
+  for (let r = 0; r < K; r++) {
+    const h = document.createElement('div'); h.style.background = COLORS[r]; h.style.borderRadius = '50%'; m.appendChild(h);
+    for (let c = 0; c < K; c++) {
+      const v = rules[r][c], d = document.createElement('div');
+      d.style.background = v > 0 ? `rgba(80,220,120,${v})` : `rgba(240,70,80,${-v})`;
+      d.title = `${v > 0 ? 'attract' : 'repel'} ${v}`;
+      d.onclick = () => { const steps = [-1, -0.5, 0, 0.5, 1]; const k = steps.findIndex(s => s > rules[r][c] + 1e-6); rules[r][c] = steps[k === -1 ? 0 : k]; drawMatrix(); };
+      m.appendChild(d);
+    }
+  }
+}
+
+function readSliders() {
+  R = +document.getElementById('r').value * (canvas.width / innerWidth);
+  FRICTION = +document.getElementById('f').value;
+  document.getElementById('nv').textContent = document.getElementById('n').value;
+  document.getElementById('rv').textContent = document.getElementById('r').value;
+  document.getElementById('fv').textContent = FRICTION.toFixed(2);
+}
+
+function pointer(e) {
+  const s = canvas.width / innerWidth;
+  mouse = { x: e.clientX * s, y: e.clientY * s };
+}
+canvas.addEventListener('pointerdown', e => { pointer(e); canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener('pointermove', e => { if (mouse) pointer(e); });
+canvas.addEventListener('pointerup', () => mouse = null);
+
+document.getElementById('rand').onclick = () => { randomRules(); spawn(); };
+document.getElementById('pause').onclick = () => paused = !paused;
+document.getElementById('n').oninput = () => { readSliders(); spawn(); };
+document.getElementById('r').oninput = readSliders;
+document.getElementById('f').oninput = readSliders;
+const togglePanel = () => { const p = document.getElementById('panel'); p.style.display = p.style.display === 'none' ? '' : 'none'; };
+document.getElementById('hide').onclick = togglePanel;
+addEventListener('keydown', e => {
+  if (e.key === 'r' || e.key === 'R') { randomRules(); spawn(); }
+  if (e.key === ' ') { paused = !paused; e.preventDefault(); }
+  if (e.key === 'h' || e.key === 'H') togglePanel();
+});
+addEventListener('resize', () => { resize(); readSliders(); spawn(); });
+
+resize(); readSliders(); randomRules(); spawn(); loop();
+</script>
+</body>
+</html>
