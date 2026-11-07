@@ -1,0 +1,35 @@
+name: Publish each project as its own repo
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  split:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create a repo per project folder
+        env:
+          GH_TOKEN: ${{ secrets.REPO_TOKEN }}
+          OWNER: zediedsnow
+        run: |
+          if [ -z "$GH_TOKEN" ]; then echo "REPO_TOKEN secret not set - skipping"; exit 0; fi
+          for dir in 20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]-*/; do
+            dir=${dir%/}
+            name=${dir:11}            # strip the YYYY-MM-DD- prefix
+            if gh api "repos/$OWNER/$name" >/dev/null 2>&1; then
+              echo "$name already exists"; continue
+            fi
+            desc=$(grep -m1 -v '^#' "$dir/README.md" | grep -v '^$' | head -c 300 | tr -d '\n*`')
+            gh api user/repos -f name="$name" -f description="$desc" -F private=false >/dev/null
+            tmp=$(mktemp -d); cp -r "$dir"/. "$tmp"; cd "$tmp"
+            git init -q -b main
+            git -c user.name="zediedsnow" -c user.email="155262094+zediedsnow@users.noreply.github.com" add -A
+            git -c user.name="zediedsnow" -c user.email="155262094+zediedsnow@users.noreply.github.com" \
+              commit -qm "${dir:0:10}: initial commit (from daily-projects)"
+            git push -q "https://x-access-token:${GH_TOKEN}@github.com/$OWNER/$name.git" main
+            cd - >/dev/null
+            echo "created $OWNER/$name"
+          done
