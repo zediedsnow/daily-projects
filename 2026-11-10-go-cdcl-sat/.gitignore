@@ -1,0 +1,5 @@
+gosat
+/gosat
+*.test
+*.out
+*.prof
