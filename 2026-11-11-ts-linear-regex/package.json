@@ -1,0 +1,14 @@
+{
+  "name": "linrex",
+  "version": "1.0.0",
+  "description": "A ReDoS-proof regular expression engine in TypeScript: Thompson NFA, Pike VM captures, lazy DFA",
+  "license": "MIT",
+  "private": true,
+  "bin": { "linrex": "dist/cli.js" },
+  "scripts": {
+    "build": "tsc -p .",
+    "test": "node dist/fuzz.js",
+    "bench": "node dist/cli.js bench"
+  },
+  "devDependencies": { "@types/node": "^22.0.0", "typescript": "^5.4.0" }
+}
