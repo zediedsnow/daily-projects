@@ -1,0 +1,57 @@
+// Sort 300,000 pseudo-random numbers with an in-place quicksort
+// (median-of-three pivot, Hoare partition, insertion sort for tiny ranges).
+let seed = [12345];
+fn rand(seed: int[]): int {
+    seed[0] = (seed[0] * 6364136223846793005 + 1442695040888963407);
+    let x = seed[0] / 65536;
+    if x < 0 { x = -x; }
+    return x % 1000000;
+}
+
+fn insertion(a: int[], lo: int, hi: int) {
+    for i in lo + 1..hi + 1 {
+        let v = a[i];
+        let j = i - 1;
+        while j >= lo && a[j] > v { a[j + 1] = a[j]; j = j - 1; }
+        a[j + 1] = v;
+    }
+}
+
+fn swap(a: int[], i: int, j: int) { let t = a[i]; a[i] = a[j]; a[j] = t; }
+
+fn qsort(a: int[], lo: int, hi: int) {
+    while hi - lo > 16 {
+        let mid = lo + (hi - lo) / 2;
+        if a[mid] < a[lo] { swap(a, mid, lo); }
+        if a[hi] < a[lo] { swap(a, hi, lo); }
+        if a[hi] < a[mid] { swap(a, hi, mid); }
+        let pivot = a[mid];
+        let i = lo - 1;
+        let j = hi + 1;
+        while 1 {
+            i = i + 1; while a[i] < pivot { i = i + 1; }
+            j = j - 1; while a[j] > pivot { j = j - 1; }
+            if i >= j { break; }
+            swap(a, i, j);
+        }
+        // recurse into the smaller half, loop on the larger: O(log n) stack
+        if j - lo < hi - j { qsort(a, lo, j); lo = j + 1; }
+        else { qsort(a, j + 1, hi); hi = j; }
+    }
+    insertion(a, lo, hi);
+}
+
+let n = 300_000;
+let a = array(n);
+for i in 0..n { a[i] = rand(seed); }
+qsort(a, 0, n - 1);
+
+let sorted = 1;
+let checksum = 0;
+for i in 0..n {
+    if i > 0 && a[i - 1] > a[i] { sorted = 0; }
+    checksum = (checksum * 31 + a[i]) % 1000000007;
+}
+print("sorted:", sorted, "min:", a[0], "median:", a[n / 2], "max:", a[n - 1]);
+print("checksum:", checksum);
+print("first ten:", [a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8], a[9]]);

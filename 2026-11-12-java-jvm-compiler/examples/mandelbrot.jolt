@@ -1,0 +1,25 @@
+// ASCII Mandelbrot set in 16.16-style fixed point: Jolt has no floats, so we
+// scale everything by 2^12 and keep the products in 64-bit range.
+// escape-time bands: few iterations = far away = light, many = near the set = dense
+let shades = [' ', '.', ':', '-', '=', '+', '*', '#', '%'];
+let bands = [2, 3, 4, 5, 7, 10, 16, 30, 200];
+let one = 4096;
+let w = 78;
+let h = 32;
+let maxIter = 200;
+for row in 0..h {
+    let ci = (row * 2 * one * 12 / 10) / h - one * 12 / 10;     // -1.2 .. 1.2
+    for col in 0..w {
+        let cr = (col * 3 * one) / w - 2 * one - one / 4;        // -2.25 .. 0.75
+        let zr = 0; let zi = 0; let k = 0;
+        while k < maxIter && zr * zr + zi * zi <= 4 * one * one {
+            let t = (zr * zr - zi * zi) / one + cr;
+            zi = 2 * zr * zi / one + ci;
+            zr = t;
+            k = k + 1;
+        }
+        if k == maxIter { putc('@'); }
+        else { let b = 0; while k > bands[b] { b = b + 1; } putc(shades[b]); }
+    }
+    putc(10);
+}

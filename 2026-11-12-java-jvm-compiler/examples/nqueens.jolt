@@ -1,0 +1,20 @@
+// Count every placement of n non-attacking queens, with backtracking over three
+// occupancy arrays (columns and both diagonals).
+fn solve(row: int, n: int, cols: int[], d1: int[], d2: int[]): int {
+    if row == n { return 1; }
+    let total = 0;
+    for c in 0..n {
+        if cols[c] == 0 && d1[row + c] == 0 && d2[row - c + n] == 0 {
+            cols[c] = 1; d1[row + c] = 1; d2[row - c + n] = 1;
+            total = total + solve(row + 1, n, cols, d1, d2);
+            cols[c] = 0; d1[row + c] = 0; d2[row - c + n] = 0;
+        }
+    }
+    return total;
+}
+
+fn queens(n: int): int {
+    return solve(0, n, array(n), array(2 * n), array(2 * n + 1));
+}
+
+for n in 1..11 { print("queens", n, "->", queens(n), "solutions"); }

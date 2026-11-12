@@ -1,0 +1,36 @@
+// A tour of the language, doubling as a semantics test.
+fn gcd(a: int, b: int): int { while b != 0 { let t = a % b; a = b; b = t; } return a; }
+fn side(x: int[], i: int): int { x[0] = x[0] + i; return i; }   // records evaluation order
+fn make(n: int): int[] { let r = array(n); for i in 0..n { r[i] = i * i; } return r; }
+
+print("arith:", 7 / 2, -7 / 2, 7 % 3, -7 % 3, 1 + 2 * 3 - 4, (1 + 2) * (3 - 4), -(-5));
+print("compare:", 3 < 4, 4 < 3, 3 <= 3, 3 >= 4, 2 == 2, 2 != 2, !0, !7);
+print("big:", 9_223_372_036_854_775_807, 9_223_372_036_854_775_807 + 1, 100000 * 100000, abs(-42));
+print("gcd:", gcd(1071, 462), gcd(17, 5));
+
+let log = [0];
+let r = side(log, 1) == 0 && side(log, 10) == 10;     // && short-circuits: second call skipped
+let s = side(log, 0) == 0 || side(log, 100) == 0;     // || short-circuits too
+print("short-circuit:", r, s, "log =", log[0]);
+
+let squares = make(8);
+print("array:", squares, "len", len(squares), "literal", [3, -1, 4]);
+
+let total = 0;
+for i in 0..100 {
+    if i % 2 == 0 { continue; }
+    if i > 20 { break; }
+    total = total + i;
+}
+print("odd sum < 20:", total);
+
+let x = 1;
+{ let x = 2; print("shadowed:", x); }
+print("outer:", x);
+
+let n = 27; let steps = 0;
+while n != 1 { if n % 2 == 0 { n = n / 2; } else { n = 3 * n + 1; } steps = steps + 1; }
+print("collatz(27) steps:", steps);
+let grade = 83;
+if grade >= 90 { print("A"); } else if grade >= 80 { print("B"); } else { print("C"); }
+print("chars:", 'A', 'z', "escapes:\t\"ok\"");

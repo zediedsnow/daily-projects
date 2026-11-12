@@ -1,0 +1,10 @@
+// Naive recursive Fibonacci: the classic "how fast are function calls?" benchmark.
+fn fib(n: int): int {
+    if n < 2 { return n; }
+    return fib(n - 1) + fib(n - 2);
+}
+
+let first = array(15);
+for i in 0..15 { first[i] = fib(i); }
+print("first 15:", first);
+print("fib(32) =", fib(32));

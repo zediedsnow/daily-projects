@@ -1,0 +1,12 @@
+// The Ackermann function: tiny code, explosive recursion depth.
+fn ack(m: int, n: int): int {
+    if m == 0 { return n + 1; }
+    if n == 0 { return ack(m - 1, 1); }
+    return ack(m - 1, ack(m, n - 1));
+}
+for m in 0..4 {
+    let row = array(6);
+    for n in 0..6 { row[n] = ack(m, n); }
+    print("ack", m, "n for n in 0..5:", row);
+}
+print("ack(3, 9) =", ack(3, 9));

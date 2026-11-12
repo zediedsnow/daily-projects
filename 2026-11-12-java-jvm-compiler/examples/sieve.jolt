@@ -1,0 +1,15 @@
+// Sieve of Eratosthenes over the first two million integers.
+let n = 2_000_000;
+let composite = array(n + 1);
+let count = 0;
+let last = 0;
+for i in 2..n + 1 {
+    if composite[i] == 0 {
+        count = count + 1;
+        last = i;
+        let j = i * i;
+        while j <= n { composite[j] = 1; j = j + i; }
+    }
+}
+print("primes up to", n, "=", count);
+print("largest:", last);

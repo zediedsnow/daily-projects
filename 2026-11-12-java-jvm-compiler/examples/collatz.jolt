@@ -1,0 +1,19 @@
+// Project Euler 14: which start below one million gives the longest Collatz chain?
+// Memoises chain lengths for small values in an array.
+let limit = 1_000_000;
+let memo = array(limit);
+memo[1] = 1;
+let best = 1;
+let bestLen = 1;
+for start in 2..limit {
+    let n = start;
+    let steps = 0;
+    while n >= limit || memo[n] == 0 {
+        if n % 2 == 0 { n = n / 2; } else { n = 3 * n + 1; }
+        steps = steps + 1;
+    }
+    let len = steps + memo[n];
+    memo[start] = len;
+    if len > bestLen { bestLen = len; best = start; }
+}
+print("longest chain below", limit, "starts at", best, "with", bestLen, "terms");

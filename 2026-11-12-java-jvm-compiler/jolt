@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+# Build (if sources changed) and run the Jolt compiler.
+set -e
+DIR=$(cd "$(dirname "$0")" && pwd)
+if [ ! -f "$DIR/build/Jolt.class" ] || [ -n "$(find "$DIR/src" -newer "$DIR/build/Jolt.class")" ]; then
+    javac -d "$DIR/build" "$DIR"/src/*.java
+fi
+exec java -cp "$DIR/build" Jolt "$@"
