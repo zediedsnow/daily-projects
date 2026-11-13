@@ -1,0 +1,25 @@
+data Shape = Circle Int | Rect Int Int | Triangle Int Int Int
+
+-- Forgot the triangle case:
+let area s = match s with
+  | Circle r -> 3 * r * r
+  | Rect w h -> w * h
+
+-- Second arm is shadowed by the first:
+let classify xs = match xs with
+  | _ :: _ -> "non-empty"
+  | [x] -> "singleton"
+  | [] -> "empty"
+
+-- Deep witness: the checker finds the exact missing nested case.
+let both opts = match opts with
+  | (Some a, Some b) -> a + b
+  | (None, _) -> 0
+  | (Some a, None) -> a
+
+let zip_sum xs ys = match (xs, ys) with
+  | ([], []) -> 0
+  | (x :: _, y :: _) -> x + y
+
+let _ = print (show (area (Rect 3 4)))
+let _ = print (show (area (Triangle 3 4 5)))

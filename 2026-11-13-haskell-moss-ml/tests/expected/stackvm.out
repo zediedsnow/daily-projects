@@ -1,0 +1,23 @@
+bytecode for  let x = 3 + 4 in let y = x * x in ifz (y - 49) then y * 2 else 0
+  0	push 3
+  1	push 4
+  2	op +
+  3	store
+  4	load 0
+  5	load 0
+  6	op *
+  7	store
+  8	load 0
+  9	push 49
+  10	op -
+  11	jmpz +2
+  12	push 0
+  13	jmp +3
+  14	load 0
+  15	push 2
+  16	op *
+  17	drop
+  18	drop
+interpreter: 98   vm: 98
+random programs where VM == interpreter: 300 / 300  (32546 VM steps)
+[exit 0]

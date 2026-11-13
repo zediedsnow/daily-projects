@@ -1,0 +1,16 @@
+twice (+3) 10       = 16
+twice on strings    = hey!!
+polymorphic use     = (20, true)
+30!                 = 265252859812191058636308480000000
+evens below 10      = [0, 2, 4, 6, 8]
+squares of odds     = [1, 9, 25, 49, 81]
+sum of the above    = 165
+sorted              = [3, 4, 5, 9, 15, 26, 31]
+sort_by descending  = ["pear", "fig", "apple"]
+counter from 100    = [100, 125, 150, 175, 200]
+zip + swap          = [("one", 1), ("two", 2), ("three", 3)]
+safe_div 84 2       = Ok 42
+safe_div 1 0        = Err: division by zero
+doubled letters     = mmoossss
+joined              = 1, 2, 3, 4, 5
+[exit 0]

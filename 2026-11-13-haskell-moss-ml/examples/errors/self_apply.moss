@@ -1,0 +1,2 @@
+-- The Y combinator needs self-application, which simple types reject.
+let omega = fun x -> x x

@@ -1,0 +1,5 @@
+examples/errors/self_apply.moss:2:22: type error: this expression has type a but is applied as a function of type a -> b
+    (infinite type: a = a -> b)
+2 | let omega = fun x -> x x
+                         ^
+[exit 1]

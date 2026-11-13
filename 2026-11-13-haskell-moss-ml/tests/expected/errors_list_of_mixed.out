@@ -1,0 +1,5 @@
+examples/errors/list_of_mixed.moss:2:49: type error: this argument has type List (Int, String) but the function expects List (a, Int)
+    (cannot match Int with String)
+2 | let total = foldl (fun acc (n, s) -> acc + s) 0 pairs
+                                                    ^
+[exit 1]

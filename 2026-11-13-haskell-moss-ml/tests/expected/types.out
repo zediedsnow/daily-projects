@@ -1,0 +1,21 @@
+i : a -> a
+k : a -> b -> a
+s : (a -> b -> c) -> (a -> b) -> a -> c
+skk : a -> a
+compose : (a -> b) -> (c -> a) -> c -> b
+church_zero : a -> b -> b
+church_succ : ((a -> b) -> c -> a) -> (a -> b) -> c -> b
+church_add : (a -> b -> c) -> (a -> d -> b) -> a -> d -> c
+to_int : ((Int -> Int) -> Int -> a) -> a
+three : (a -> a) -> a -> a
+poly_pair : (Int, String, Bool)
+map_pairs : (a -> b) -> List (a, a) -> List (b, b)
+fold_tree : (a -> b -> a) -> a -> List b -> a
+curry : ((a, b) -> c) -> a -> b -> c
+uncurry : (a -> b -> c) -> (a, b) -> c
+apply_all : List (a -> b) -> a -> List b
+first_some : List (Option a) -> Option (Option a)
+Rose : a -> List (Rose a) -> Rose a
+rose_size : Rose a -> Int
+rose_map : (a -> b) -> Rose a -> Rose b
+[exit 0]

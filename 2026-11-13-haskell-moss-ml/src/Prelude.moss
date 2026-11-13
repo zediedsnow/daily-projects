@@ -1,0 +1,104 @@
+-- The Moss prelude. It is ordinary Moss code: parsed, type-checked and
+-- exhaustiveness-checked like any user program before yours runs.
+
+data List a = Nil | Cons a (List a)
+data Option a = None | Some a
+data Result e a = Err e | Ok a
+
+let id x = x
+let const x _ = x
+let flip f x y = f y x
+let compose f g x = f (g x)
+let fst (a, _) = a
+let snd (_, b) = b
+let max a b = if a > b then a else b
+let min a b = if a < b then a else b
+let abs n = if n < 0 then -n else n
+let ignore _ = ()
+
+let rec map f xs = match xs with
+  | [] -> []
+  | x :: rest -> f x :: map f rest
+
+let rec iter f xs = match xs with
+  | [] -> ()
+  | x :: rest -> f x; iter f rest
+
+let rec filter p xs = match xs with
+  | [] -> []
+  | x :: rest -> if p x then x :: filter p rest else filter p rest
+
+let rec foldl f acc xs = match xs with
+  | [] -> acc
+  | x :: rest -> foldl f (f acc x) rest
+
+let rec foldr f xs acc = match xs with
+  | [] -> acc
+  | x :: rest -> f x (foldr f rest acc)
+
+let length xs = foldl (fun n _ -> n + 1) 0 xs
+let sum xs = foldl (+) 0 xs
+let product xs = foldl (*) 1 xs
+let reverse xs = foldl (fun acc x -> x :: acc) [] xs
+let append xs ys = foldr (::) xs ys
+let concat xss = foldr append xss []
+let concat_map f xs = concat (map f xs)
+
+let rec range a b = if a > b then [] else a :: range (a + 1) b
+
+let rec take n xs = match xs with
+  | [] -> []
+  | x :: rest -> if n <= 0 then [] else x :: take (n - 1) rest
+
+let rec drop n xs = match xs with
+  | [] -> []
+  | _ :: rest -> if n <= 0 then xs else drop (n - 1) rest
+
+let rec zip xs ys = match (xs, ys) with
+  | (x :: xs', y :: ys') -> (x, y) :: zip xs' ys'
+  | _ -> []
+
+let rec any p xs = match xs with
+  | [] -> false
+  | x :: rest -> p x || any p rest
+
+let all p xs = not (any (fun x -> not (p x)) xs)
+let mem x xs = any (fun y -> y == x) xs
+
+let rec find p xs = match xs with
+  | [] -> None
+  | x :: rest -> if p x then Some x else find p rest
+
+let rec nth xs n = match xs with
+  | [] -> error "nth: index out of range"
+  | x :: rest -> if n == 0 then x else nth rest (n - 1)
+
+let rec join sep xs = match xs with
+  | [] -> ""
+  | [x] -> x
+  | x :: rest -> x ^ sep ^ join sep rest
+
+let rec merge cmp xs ys = match (xs, ys) with
+  | ([], _) -> ys
+  | (_, []) -> xs
+  | (x :: xt, y :: yt) ->
+      if cmp x y <= 0 then x :: merge cmp xt ys else y :: merge cmp xs yt
+
+let rec sort_by cmp xs = match xs with
+  | [] -> []
+  | [x] -> [x]
+  | _ ->
+      let half = length xs / 2 in
+      merge cmp (sort_by cmp (take half xs)) (sort_by cmp (drop half xs))
+
+let sort xs = sort_by compare xs
+
+let option_map f o = match o with
+  | None -> None
+  | Some x -> Some (f x)
+
+let with_default d o = match o with
+  | None -> d
+  | Some x -> x
+
+let println_all xs = iter (fun x -> print (show x)) xs

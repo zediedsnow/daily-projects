@@ -1,0 +1,50 @@
+-- A quick tour of Moss. Run with:  ./moss examples/tour.moss
+-- Ask for inferred types with:     ./moss --types examples/tour.moss
+
+-- No type annotations anywhere: everything below is inferred.
+let twice f x = f (f x)
+let compose3 f g h x = f (g (h x))
+let pair_up x = (x, x)
+
+let _ = print ("twice (+3) 10       = " ^ show (twice (fun n -> n + 3) 10))
+let _ = print ("twice on strings    = " ^ twice (fun s -> s ^ "!") "hey")
+
+-- Let-polymorphism: `twice` is used at two different types in one expression.
+let _ = print ("polymorphic use     = " ^ show (twice (fun n -> n * 2) 5, twice not true))
+
+-- Integers are arbitrary precision.
+let rec fact n = if n <= 1 then 1 else n * fact (n - 1)
+let _ = print ("30!                 = " ^ show (fact 30))
+
+-- Mutual recursion with `let rec ... and ...`
+let rec is_even n = if n == 0 then true else is_odd (n - 1)
+and is_odd n = if n == 0 then false else is_even (n - 1)
+let _ = print ("evens below 10      = " ^ show (filter is_even (range 0 9)))
+
+-- Pipelines, closures and the prelude
+let squares_of_odds xs = xs |> filter is_odd |> map (fun x -> x * x)
+let _ = print ("squares of odds     = " ^ show (squares_of_odds (range 1 10)))
+let _ = print ("sum of the above    = " ^ show (sum (squares_of_odds (range 1 10))))
+let _ = print ("sorted              = " ^ show (sort [31, 4, 15, 9, 26, 5, 3]))
+let _ = print ("sort_by descending  = " ^ show (sort_by (fun a b -> compare b a) ["pear", "fig", "apple"]))
+
+-- Closures capture their environment
+let make_counter_from start = fun step -> map (fun i -> start + i * step) (range 0 4)
+let _ = print ("counter from 100    = " ^ show (make_counter_from 100 25))
+
+-- Tuples and pattern matching in function parameters
+let swap (a, b) = (b, a)
+let _ = print ("zip + swap          = " ^ show (map swap (zip [1, 2, 3] ["one", "two", "three"])))
+
+-- Option and Result are ordinary algebraic data types from the prelude
+let safe_div a b = if b == 0 then Err "division by zero" else Ok (a / b)
+let describe r = match r with
+  | Ok v -> "Ok " ^ show v
+  | Err msg -> "Err: " ^ msg
+let _ = print ("safe_div 84 2       = " ^ describe (safe_div 84 2))
+let _ = print ("safe_div 1 0        = " ^ describe (safe_div 1 0))
+
+-- Strings
+let shout s = implode (map (fun c -> c ^ c) (chars s))
+let _ = print ("doubled letters     = " ^ shout "moss")
+let _ = print ("joined              = " ^ join ", " (map show (range 1 5)))

@@ -1,0 +1,25 @@
+-- Golden tests for type inference: `./moss --types tests/types.moss`
+let i x = x
+let k x y = x
+let s f g x = f x (g x)
+let skk = s k k
+let compose f g x = f (g x)
+let church_zero f x = x
+let church_succ n f x = f (n f x)
+let church_add m n f x = m f (n f x)
+let to_int n = n (fun k -> k + 1) 0
+let three = church_succ (church_succ (church_succ church_zero))
+let poly_pair = (i 1, i "one", i true)
+let map_pairs f = map (fun (a, b) -> (f a, f b))
+let rec fold_tree f acc t = match t with
+  | [] -> acc
+  | x :: rest -> fold_tree f (f acc x) rest
+let curry f a b = f (a, b)
+let uncurry f (a, b) = f a b
+let apply_all fs x = map (fun f -> f x) fs
+let first_some xs = find (fun o -> o != None) xs
+data Rose a = Rose a (List (Rose a))
+let rec rose_size t = match t with
+  | Rose _ kids -> 1 + sum (map rose_size kids)
+let rec rose_map f t = match t with
+  | Rose x kids -> Rose (f x) (map (rose_map f) kids)

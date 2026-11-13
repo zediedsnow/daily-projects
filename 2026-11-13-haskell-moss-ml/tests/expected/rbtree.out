@@ -1,0 +1,9 @@
+inserted keys        : 2000 (1979 distinct)
+tree size            : 1979
+height               : 15  (a plain BST on sorted input would be 1979)
+in-order == sorted   : true
+no red-red violations: true
+black height         : Some 10
+member checks        : (true, false)
+4095 ascending keys  : height 12, black height Some 13
+[exit 0]

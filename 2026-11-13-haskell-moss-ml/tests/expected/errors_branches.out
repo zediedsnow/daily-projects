@@ -1,0 +1,4 @@
+examples/errors/branches.moss:3:8: type error: the 'else' branch has type Int but the 'then' branch has type String
+3 |   else n * 2
+           ^
+[exit 1]

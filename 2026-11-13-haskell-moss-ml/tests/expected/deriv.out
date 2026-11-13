@@ -1,0 +1,21 @@
+f(x)   = (x^3 + 5x)
+f'(x)  = (3*x^2 + 5)
+f'(3)  = 32   (5-point stencil: 32, y = 2)
+
+f(x)   = (x + 1)*(x - 1)
+f'(x)  = ((x - 1) + (x + 1))
+f'(3)  = 6   (5-point stencil: 6, y = 2)
+
+f(x)   = (2x + y)^3
+f'(x)  = 6*(2x + y)^2
+f'(3)  = 384   (5-point stencil: 384, y = 2)
+
+f(x)   = x^2*y*x
+f'(x)  = (2x*y*x + x^2*y)
+f'(3)  = 54   (5-point stencil: 54, y = 2)
+
+f(x)   = -(x^4 - x^2)
+f'(x)  = -(4*x^3 - 2x)
+f'(3)  = -102   (5-point stencil: -102, y = 2)
+
+[exit 0]

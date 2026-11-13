@@ -1,0 +1,10 @@
+examples/errors/warnings.moss:4:14: warning: this match is not exhaustive; for example, this value is not matched:
+    Triangle _ _ _
+examples/errors/warnings.moss:9:19: warning: match arm 2 is unreachable (earlier arms cover it)
+examples/errors/warnings.moss:20:21: warning: this match is not exhaustive; for example, this value is not matched:
+    ([], _ :: _)
+12
+examples/errors/warnings.moss:4:14: runtime error: match failure
+4 | let area s = match s with
+                 ^
+[exit 1]

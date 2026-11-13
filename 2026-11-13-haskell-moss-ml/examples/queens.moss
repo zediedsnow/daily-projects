@@ -1,0 +1,21 @@
+-- N-queens by backtracking over immutable lists.
+
+let safe col placed =
+  let rec go cols dist = match cols with
+    | [] -> true
+    | c :: rest -> c != col && abs (c - col) != dist && go rest (dist + 1)
+  in go placed 1
+
+let rec solve n row placed =
+  if row == n then [placed]
+  else concat_map (fun col -> if safe col placed then solve n (row + 1) (col :: placed) else []) (range 0 (n - 1))
+
+let queens n = solve n 0 []
+
+let render n sol =
+  map (fun col -> implode (map (fun c -> if c == col then "Q " else ". ") (range 0 (n - 1)))) (reverse sol)
+
+let _ = iter (fun n -> print ("n = " ^ show n ^ ": " ^ show (length (queens n)) ^ " solutions")) (range 1 8)
+let _ = print ""
+let _ = print "first solution for n = 8:"
+let _ = iter print (render 8 (nth (queens 8) 0))

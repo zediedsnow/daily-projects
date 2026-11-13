@@ -1,0 +1,137 @@
+-- A compiler from arithmetic expressions with let-bindings to a stack
+-- machine, plus the VM that runs the bytecode. We check the compiled code
+-- agrees with a direct tree-walking evaluator on many generated programs.
+
+data Expr
+  = Lit Int
+  | Var String
+  | Bin String Expr Expr
+  | Let String Expr Expr
+  | IfZ Expr Expr Expr
+
+data Instr
+  = Push Int
+  | Load Int            -- de Bruijn-style index into the variable stack
+  | Store               -- pop value, push onto variable stack
+  | Drop                -- pop variable stack
+  | Op String
+  | JmpZ Int            -- relative jump if top of stack is zero
+  | Jmp Int
+
+let apply_op op a b = match op with
+  | "+" -> a + b
+  | "-" -> a - b
+  | "*" -> a * b
+  | _ -> error ("unknown operator " ^ op)
+
+-- reference semantics -------------------------------------------------------
+let rec lookup x env = match env with
+  | [] -> error ("unbound " ^ x)
+  | (k, v) :: rest -> if k == x then v else lookup x rest
+
+let rec interp env e = match e with
+  | Lit n -> n
+  | Var x -> lookup x env
+  | Bin op a b -> apply_op op (interp env a) (interp env b)
+  | Let x a b -> interp ((x, interp env a) :: env) b
+  | IfZ c a b -> if interp env c == 0 then interp env a else interp env b
+
+-- compiler ------------------------------------------------------------------
+let rec index_of x scope i = match scope with
+  | [] -> error ("unbound " ^ x)
+  | y :: rest -> if x == y then i else index_of x rest (i + 1)
+
+let rec compile scope e = match e with
+  | Lit n -> [Push n]
+  | Var x -> [Load (index_of x scope 0)]
+  | Bin op a b -> compile scope a @ compile scope b @ [Op op]
+  | Let x a b -> compile scope a @ [Store] @ compile (x :: scope) b @ [Drop]
+  | IfZ c a b ->
+      let ca = compile scope a in
+      let cb = compile scope b in
+      compile scope c @ [JmpZ (length cb + 1)] @ cb @ [Jmp (length ca)] @ ca
+
+-- virtual machine -------------------------------------------------------------
+-- Code is a list; we pre-split it into an indexable "array" via a balanced tree
+data Arr a = Leaf | Node (Arr a) a (Arr a) Int
+
+let rec build xs n = if n == 0 then (Leaf, xs) else
+  let half = (n - 1) / 2 in
+  let (l, rest) = build xs half in
+  match rest with
+  | x :: rest' ->
+      let (r, rest'') = build rest' (n - 1 - half) in
+      (Node l x r half, rest'')
+  | [] -> error "build"
+
+let rec get arr i = match arr with
+  | Leaf -> error "index out of bounds"
+  | Node l x r k -> if i < k then get l i else if i == k then x else get r (i - k - 1)
+
+let run code =
+  let n = length code in
+  let (arr, _) = build code n in
+  let rec step pc stack vars steps =
+    if pc == n then (match stack with [v] -> (v, steps) | _ -> error "bad final stack") else
+    match (get arr pc, stack, vars) with
+    | (Push k, s, vs) -> step (pc + 1) (k :: s) vs (steps + 1)
+    | (Load i, s, vs) -> step (pc + 1) (nth vs i :: s) vs (steps + 1)
+    | (Store, v :: s, vs) -> step (pc + 1) s (v :: vs) (steps + 1)
+    | (Drop, s, _ :: vs) -> step (pc + 1) s vs (steps + 1)
+    | (Op o, b :: a :: s, vs) -> step (pc + 1) (apply_op o a b :: s) vs (steps + 1)
+    | (JmpZ off, v :: s, vs) -> step (if v == 0 then pc + 1 + off else pc + 1) s vs (steps + 1)
+    | (Jmp off, s, vs) -> step (pc + 1 + off) s vs (steps + 1)
+    | _ -> error "VM: stack underflow"
+  in step 0 [] [] 0
+
+let rec show_instr i = match i with
+  | Push n -> "push " ^ show n
+  | Load k -> "load " ^ show k
+  | Store -> "store"
+  | Drop -> "drop"
+  | Op o -> "op " ^ o
+  | JmpZ k -> "jmpz +" ^ show k
+  | Jmp k -> "jmp +" ^ show k
+
+-- a worked example ------------------------------------------------------------
+let sample =
+  Let "x" (Bin "+" (Lit 3) (Lit 4))
+    (Let "y" (Bin "*" (Var "x") (Var "x"))
+      (IfZ (Bin "-" (Var "y") (Lit 49)) (Bin "*" (Var "y") (Lit 2)) (Lit 0)))
+
+let code = compile [] sample
+let _ = print "bytecode for  let x = 3 + 4 in let y = x * x in ifz (y - 49) then y * 2 else 0"
+let _ = iter (fun (i, ins) -> print ("  " ^ show i ^ "\t" ^ show_instr ins)) (zip (range 0 (length code - 1)) code)
+let _ = print ("interpreter: " ^ show (interp [] sample) ^ "   vm: " ^ show (fst (run code)))
+
+-- differential testing on generated programs -----------------------------------
+let rec gen seed depth scope =
+  let s1 = (seed * 1103515245 + 12345) % 2147483648 in
+  let pick = (s1 / 65536) % 6 in
+  if depth == 0 || pick == 0 then
+    (match scope with
+     | v :: _ -> if s1 % 2 == 0 then (Var v, s1) else (Lit (s1 % 10), s1)
+     | [] -> (Lit (s1 % 10), s1))
+  else if pick <= 2 then
+    let (a, s2) = gen s1 (depth - 1) scope in
+    let (b, s3) = gen s2 (depth - 1) scope in
+    (Bin (nth ["+", "-", "*"] (s3 % 3)) a b, s3)
+  else if pick <= 4 then
+    let name = "v" ^ show depth in
+    let (a, s2) = gen s1 (depth - 1) scope in
+    let (b, s3) = gen s2 (depth - 1) (name :: scope) in
+    (Let name a b, s3)
+  else
+    let (c, s2) = gen s1 (depth - 1) scope in
+    let (a, s3) = gen s2 (depth - 1) scope in
+    let (b, s4) = gen s3 (depth - 1) scope in
+    (IfZ c a b, s4)
+
+let rec check i seed agree total_steps =
+  if i == 0 then (agree, total_steps) else
+  let (e, seed') = gen seed 7 [] in
+  let (v, steps) = run (compile [] e) in
+  check (i - 1) seed' (if v == interp [] e then agree + 1 else agree) (total_steps + steps)
+
+let (agree, steps) = check 300 7 0 0
+let _ = print ("random programs where VM == interpreter: " ^ show agree ^ " / 300  (" ^ show steps ^ " VM steps)")

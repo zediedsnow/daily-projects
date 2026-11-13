@@ -1,0 +1,90 @@
+-- Symbolic differentiation with algebraic simplification.
+
+data Expr
+  = Num Int
+  | Var String
+  | Add Expr Expr
+  | Mul Expr Expr
+  | Pow Expr Int
+  | Neg Expr
+
+let rec simplify e = match e with
+  | Add a b ->
+      (match (simplify a, simplify b) with
+       | (Num 0, y) -> y
+       | (x, Num 0) -> x
+       | (Num x, Num y) -> Num (x + y)
+       | (x, Neg y) -> if x == y then Num 0 else Add x (Neg y)
+       | (x, y) -> if x == y then Mul (Num 2) x else Add x y)
+  | Mul a b ->
+      (match (simplify a, simplify b) with
+       | (Num 0, _) -> Num 0
+       | (_, Num 0) -> Num 0
+       | (Num 1, y) -> y
+       | (x, Num 1) -> x
+       | (Num x, Num y) -> Num (x * y)
+       | (Num x, Mul (Num y) z) -> Mul (Num (x * y)) z
+       | (x, Num n) -> simplify (Mul (Num n) x)
+       | (x, y) -> if x == y then Pow x 2 else Mul x y)
+  | Pow a n ->
+      (match (simplify a, n) with
+       | (_, 0) -> Num 1
+       | (x, 1) -> x
+       | (Num x, k) -> Num (foldl (fun acc _ -> acc * x) 1 (range 1 k))
+       | (x, k) -> Pow x k)
+  | Neg a ->
+      (match simplify a with
+       | Num n -> Num (-n)
+       | Neg x -> x
+       | x -> Neg x)
+  | _ -> e
+
+let rec d x e = match e with
+  | Num _ -> Num 0
+  | Var y -> if x == y then Num 1 else Num 0
+  | Add a b -> Add (d x a) (d x b)
+  | Mul a b -> Add (Mul (d x a) b) (Mul a (d x b))
+  | Pow a n -> Mul (Mul (Num n) (Pow a (n - 1))) (d x a)
+  | Neg a -> Neg (d x a)
+
+let rec pretty e = match e with
+  | Num n -> if n < 0 then "(" ^ show n ^ ")" else show n
+  | Var v -> v
+  | Add a (Neg b) -> "(" ^ pretty a ^ " - " ^ pretty b ^ ")"
+  | Add a (Num n) -> if n < 0 then "(" ^ pretty a ^ " - " ^ show (-n) ^ ")" else "(" ^ pretty a ^ " + " ^ show n ^ ")"
+  | Add a b -> "(" ^ pretty a ^ " + " ^ pretty b ^ ")"
+  | Mul (Num n) (Var v) -> show n ^ v
+  | Mul a b -> pretty a ^ "*" ^ pretty b
+  | Pow a n -> pretty a ^ "^" ^ show n
+  | Neg a -> "-" ^ pretty a
+
+let rec eval env e = match e with
+  | Num n -> n
+  | Var v -> with_default 0 (option_map snd (find (fun (k, _) -> k == v) env))
+  | Add a b -> eval env a + eval env b
+  | Mul a b -> eval env a * eval env b
+  | Pow a n -> foldl (fun acc _ -> acc * eval env a) 1 (range 1 n)
+  | Neg a -> 0 - eval env a
+
+let x = Var "x"
+let y = Var "y"
+let examples =
+  [ Add (Pow x 3) (Mul (Num 5) x)
+  , Mul (Add x (Num 1)) (Add x (Num (-1)))
+  , Pow (Add (Mul (Num 2) x) y) 3
+  , Mul (Mul x x) (Mul y x)
+  , Neg (Add (Pow x 4) (Neg (Pow x 2)))
+  ]
+
+let show_one e =
+  let de = simplify (d "x" e) in
+  print ("f(x)   = " ^ pretty (simplify e));
+  print ("f'(x)  = " ^ pretty de);
+  -- sanity check against a finite difference: for a polynomial of degree <= 4,
+  -- f'(x) = (8(f(x+1) - f(x-1)) - (f(x+2) - f(x-2))) / 12 exactly.
+  let at v = eval [("x", v), ("y", 2)] e in
+  let numeric = (8 * (at 4 - at 2) - (at 5 - at 1)) / 12 in
+  print ("f'(3)  = " ^ show (eval [("x", 3), ("y", 2)] de) ^ "   (5-point stencil: " ^ show numeric ^ ", y = 2)");
+  print ""
+
+let _ = iter show_one examples

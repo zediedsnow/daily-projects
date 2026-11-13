@@ -1,0 +1,79 @@
+-- Okasaki's red-black trees (Purely Functional Data Structures, ch. 3.3).
+-- The `balance` function is the classic showcase for nested pattern matching:
+-- four rotations collapse into four match arms over a 4-tuple.
+
+data Color = R | B
+data Tree a = E | T Color (Tree a) a (Tree a)
+
+let balance c l x r = match (c, l, x, r) with
+  | (B, T R (T R a x b) y c, z, d) -> T R (T B a x b) y (T B c z d)
+  | (B, T R a x (T R b y c), z, d) -> T R (T B a x b) y (T B c z d)
+  | (B, a, x, T R (T R b y c) z d) -> T R (T B a x b) y (T B c z d)
+  | (B, a, x, T R b y (T R c z d)) -> T R (T B a x b) y (T B c z d)
+  | (c, a, x, b) -> T c a x b
+
+let insert x tree =
+  let rec ins t = match t with
+    | E -> T R E x E
+    | T c a y b ->
+        if x < y then balance c (ins a) y b
+        else if x > y then balance c a y (ins b)
+        else t
+  in
+  match ins tree with
+  | T _ a y b -> T B a y b
+  | E -> error "unreachable"
+
+let rec member x t = match t with
+  | E -> false
+  | T _ a y b -> if x < y then member x a else if x > y then member x b else true
+
+let rec to_list t = match t with
+  | E -> []
+  | T _ a x b -> to_list a @ (x :: to_list b)
+
+let rec height t = match t with
+  | E -> 0
+  | T _ a _ b -> 1 + max (height a) (height b)
+
+let rec size t = match t with
+  | E -> 0
+  | T _ a _ b -> size a + 1 + size b
+
+-- Invariant 1: no red node has a red child.
+let rec no_red_red t = match t with
+  | E -> true
+  | T R (T R _ _ _) _ _ -> false
+  | T R _ _ (T R _ _ _) -> false
+  | T _ a _ b -> no_red_red a && no_red_red b
+
+-- Invariant 2: every root-to-leaf path has the same number of black nodes.
+-- Returns Some black_height, or None if the tree is unbalanced.
+let rec black_height t = match t with
+  | E -> Some 1
+  | T c a _ b ->
+      match (black_height a, black_height b) with
+      | (Some x, Some y) -> if x == y then Some (if c == B then x + 1 else x) else None
+      | _ -> None
+
+-- Insert keys in a scrambled order (a simple linear congruential sequence)
+let rec lcg_keys seed n = if n == 0 then [] else seed :: lcg_keys ((seed * 1103515245 + 12345) % 2147483648) (n - 1)
+let keys = map (fun k -> k % 100000) (lcg_keys 42 2000)
+let tree = foldl (fun t k -> insert k t) E keys
+
+let rec dedup xs = match xs with
+  | a :: b :: rest -> if a == b then dedup (b :: rest) else a :: dedup (b :: rest)
+  | _ -> xs
+let expected = dedup (sort keys)
+
+let _ = print ("inserted keys        : " ^ show (length keys) ^ " (" ^ show (length expected) ^ " distinct)")
+let _ = print ("tree size            : " ^ show (size tree))
+let _ = print ("height               : " ^ show (height tree) ^ "  (a plain BST on sorted input would be " ^ show (length expected) ^ ")")
+let _ = print ("in-order == sorted   : " ^ show (to_list tree == expected))
+let _ = print ("no red-red violations: " ^ show (no_red_red tree))
+let _ = print ("black height         : " ^ show (black_height tree))
+let _ = print ("member checks        : " ^ show (all (fun k -> member k tree) keys, member (-1) tree))
+
+-- Worst case for an unbalanced BST: ascending input
+let ascending = foldl (fun t k -> insert k t) E (range 1 4095)
+let _ = print ("4095 ascending keys  : height " ^ show (height ascending) ^ ", black height " ^ show (black_height ascending))

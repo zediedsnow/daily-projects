@@ -1,0 +1,3 @@
+let describe n =
+  if n > 100 then "big"
+  else n * 2

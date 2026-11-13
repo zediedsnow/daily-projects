@@ -1,0 +1,35 @@
+moss> let twice f x = f (f x)
+twice : (a -> a) -> a -> a = <fun>
+moss> twice (fun s -> s ^ "!") "hi"
+- : String = "hi!!"
+moss> :t twice twice
+(a -> a) -> a -> a
+moss> data Tree a = Leaf | Node (Tree a) a (Tree a)
+Leaf : Tree a
+Node : Tree a -> a -> Tree a -> Tree a
+moss> let rec insert x t = match t with | Leaf -> Node Leaf x Leaf | Node l y r -> if x < y then Node (insert x l) y r else Node l y (insert x r)
+insert : a -> Tree a -> Tree a = <fun>
+moss> let rec to_list t = match t with | Leaf -> [] | Node l x r -> to_list l @ [x] @ to_list r
+to_list : Tree a -> List a = <fun>
+moss> [5, 2, 8, 1, 9, 3] |> foldl (fun t x -> insert x t) Leaf |> to_list
+- : List Int = [1, 2, 3, 5, 8, 9]
+moss> let (q, r) = (17 / 5, 17 % 5)
+q : Int = 3
+r : Int = 2
+moss> let head xs = match xs with | x :: _ -> x
+1:15: warning: this match is not exhaustive; for example, this value is not matched:
+    []
+head : List a -> a = <fun>
+moss> head []
+runtime error: match failure (match at 1:15)
+moss> fun f -> f f
+<repl>:1:10: type error: this expression has type a but is applied as a function of type a -> b
+    (infinite type: a = a -> b)
+1 | fun f -> f f
+             ^
+moss> 1 + true
+<repl>:1:5: type error: this argument has type Bool but the function expects Int
+1 | 1 + true
+        ^
+moss> 
+[exit 0]

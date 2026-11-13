@@ -1,0 +1,12 @@
+let twice f x = f (f x)
+twice (fun s -> s ^ "!") "hi"
+:t twice twice
+data Tree a = Leaf | Node (Tree a) a (Tree a)
+let rec insert x t = match t with | Leaf -> Node Leaf x Leaf | Node l y r -> if x < y then Node (insert x l) y r else Node l y (insert x r)
+let rec to_list t = match t with | Leaf -> [] | Node l x r -> to_list l @ [x] @ to_list r
+[5, 2, 8, 1, 9, 3] |> foldl (fun t x -> insert x t) Leaf |> to_list
+let (q, r) = (17 / 5, 17 % 5)
+let head xs = match xs with | x :: _ -> x
+head []
+fun f -> f f
+1 + true

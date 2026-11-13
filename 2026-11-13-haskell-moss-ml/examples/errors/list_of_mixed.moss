@@ -1,0 +1,2 @@
+let pairs = map (fun x -> (x, show x)) [1, 2, 3]
+let total = foldl (fun acc (n, s) -> acc + s) 0 pairs
