@@ -2,10 +2,11 @@
 
 One self-contained project every day, each in a different language, built by Claude.
 
-**Languages used so far:** C (1), Go (1), Haskell (1), HTML/JS (1), Java (1), Python (1), Rust (1), TypeScript (1)
+**Languages used so far:** C (1), Go (1), Haskell (1), HTML/JS (1), Java (1), Python (1), Ruby (1), Rust (1), TypeScript (1)
 
 | Date | Project | Language | What it is |
 |------|---------|----------|------------|
+| 2026-11-14 | [Garnet](2026-11-14-ruby-sql-database/) | Ruby | SQL database from scratch: on-disk B+tree pages, crash-safe rollback journal (survives kill -9 mid-commit), query planner with index/range/hash-join access paths and EXPLAIN; matches SQLite on 143k fuzzed queries |
 | 2026-11-13 | [Moss](2026-11-13-haskell-moss-ml/) | Haskell | Tiny ML language with Hindley-Milner inference, algebraic data types, and Maranget exhaustiveness/redundancy checking with counterexamples; a fuzzer runs 200k random programs to empirically verify type soundness |
 | 2026-11-12 | [Jolt](2026-11-12-java-jvm-compiler/) | Java | Compiler for a small typed language that writes JVM .class files byte by byte (no ASM); passes the HotSpot verifier, runs ~100x faster than its reference interpreter, and agrees with it on 20k fuzzed programs |
 | 2026-11-11 | [linrex](2026-11-11-ts-linear-regex/) | TypeScript | ReDoS-proof regex engine: Thompson NFA, Pike VM captures and lazy DFA; matches V8's semantics exactly across 180k fuzzed cases while staying linear-time where V8 takes >5 s |

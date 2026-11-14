@@ -1,0 +1,106 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Garnet shell.
+#   garnet [file.db]            interactive shell (default: garnet.db)
+#   garnet file.db < script.sql run a script
+#   garnet file.db -c "SQL"     run one command
+require_relative "../lib/garnet"
+
+def format_value(v)
+  case v
+  when nil then "NULL"
+  when Float then Garnet::Ops.float_text(v)
+  else v.to_s
+  end
+end
+
+def print_result(res, out = $stdout)
+  if res.columns.empty?
+    out.puts res.message if res.message
+    return
+  end
+  cells = res.rows.map { |r| r.map { |v| format_value(v) } }
+  widths = res.columns.each_index.map { |i| ([res.columns[i].to_s.size] + cells.map { |r| r[i].size }).max }
+  numeric = res.columns.each_index.map { |i| res.rows.any? && res.rows.all? { |r| r[i].nil? || r[i].is_a?(Numeric) } }
+  line = ->(l, m, r) { l + widths.map { |w| "─" * (w + 2) }.join(m) + r }
+  out.puts line.("┌", "┬", "┐")
+  out.puts "│" + res.columns.each_with_index.map { |c, i| " #{c.to_s.ljust(widths[i])} " }.join("│") + "│"
+  out.puts line.("├", "┼", "┤")
+  cells.each do |r|
+    out.puts "│" + r.each_with_index.map { |v, i| " #{numeric[i] ? v.rjust(widths[i]) : v.ljust(widths[i])} " }.join("│") + "│"
+  end
+  out.puts line.("└", "┴", "┘")
+  out.puts "(#{res.rows.size} row#{res.rows.size == 1 ? '' : 's'})"
+end
+
+def meta_command(db, cmd)
+  case cmd.split.first
+  when ".tables" then puts db.tables.values.map { |t| t[:name] }.sort.join("  ")
+  when ".schema"
+    db.tables.each_value do |t|
+      cols = t[:cols].each_with_index.map do |c, i|
+        "#{c[:name]} #{c[:type]}#{t[:pk] == i ? ' PRIMARY KEY' : ''}#{c[:notnull] ? ' NOT NULL' : ''}".strip
+      end
+      puts "CREATE TABLE #{t[:name]} (#{cols.join(', ')});"
+      t[:indexes].each { |ix| puts "CREATE #{ix[:unique] ? 'UNIQUE ' : ''}INDEX #{ix[:name]} ON #{t[:name]}(#{t[:cols][ix[:col]][:name]});" }
+    end
+  when ".check"
+    problems = db.integrity_check
+    puts problems.empty? ? "ok" : problems
+  when ".stats" then db.page_stats.each { |k, v| puts "#{k}: #{v}" }
+  when ".help" then puts ".tables  .schema  .check  .stats  .quit   (end SQL statements with ;)"
+  when ".quit", ".exit" then exit
+  else puts "unknown command #{cmd} (try .help)"
+  end
+end
+
+def run_sql(db, sql, timer)
+  t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  db.execute(sql).each { |r| print_result(r) }
+  printf("Run time: %.3f ms\n", (Process.clock_gettime(Process::CLOCK_MONOTONIC) - t0) * 1000) if timer
+  true
+rescue Garnet::Error => e
+  puts "Error: #{e.message}"
+  false
+end
+
+path = ARGV[0] && !ARGV[0].start_with?("-") ? ARGV.shift : "garnet.db"
+db = Garnet::Database.new(path)
+if ARGV[0] == "-c"
+  exit(run_sql(db, ARGV[1], false) ? 0 : 1)
+end
+
+unless $stdin.tty?
+  ok = true
+  buf = +""
+  $stdin.each_line do |l|
+    if buf.strip.empty? && l.start_with?(".")
+      meta_command(db, l.strip)
+    else
+      buf << l
+      next unless buf.rstrip.end_with?(";")
+      ok &= run_sql(db, buf, false)
+      buf = +""
+    end
+  end
+  ok &= run_sql(db, buf, false) unless buf.strip.empty?
+  exit(ok ? 0 : 1)
+end
+
+puts "Garnet #{path} - SQL database in pure Ruby. .help for commands."
+timer = true
+buf = +""
+loop do
+  print(buf.empty? ? (db.in_transaction? ? "garnet*> " : "garnet> ") : "   ...> ")
+  line = $stdin.gets or break
+  if buf.empty? && line.start_with?(".")
+    meta_command(db, line.strip)
+    next
+  end
+  buf << line
+  next unless buf.rstrip.end_with?(";")
+  run_sql(db, buf, timer)
+  buf = +""
+end
+puts
