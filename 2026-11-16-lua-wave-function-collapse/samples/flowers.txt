@@ -1,0 +1,32 @@
+name: Flowers
+N: 3
+symmetry: 2
+periodic-input: false
+periodic-output: false
+ground: true
+size: 72 40
+color . #bfe3ff
+color r #e2384d
+color o #f28c28
+color p #9b5de5
+color y #ffd23f
+color g #3f8f3a
+color G #5bb33c
+color d #7a5230
+color D #5a3a20
+---
+........................
+...r..........o.........
+..ryr........oyo....p...
+...r..........o....pyp..
+...g..........g.....p...
+...g...p......g.....g...
+.g.g..pyp.....gg....g...
+.ggg...p......g.....g.g.
+...g...g...o..g.....ggg.
+...g..gg..oyo.g.....g...
+...g...g...o..g.....g...
+...g...g...g..g.....g...
+GGGGGGGGGGGGGGGGGGGGGGGG
+dddddddddddddddddddddddd
+DDDDDDDDDDDDDDDDDDDDDDDD

@@ -1,0 +1,40 @@
+name: Islands
+N: 3
+symmetry: 8
+periodic-input: true
+periodic-output: true
+size: 64 64
+color W #1d4e89
+color w #3f88c5
+color s #e8d8a0
+color g #6fbf4a
+color t #2f7d32
+---
+WWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWwwwwwWWWWW
+WWWwwwwwwwWWWWWWWwssssswWWWW
+WWwssssssswWWWWWwssgggsswWWW
+WwssgggggsswWWWWwsggtggswWWW
+WwsgggtgggswWWWWwsgtttgswWWW
+WwsggtttggswWWWWwsggtggswWWW
+WwsgtttttgswWWWWwssgggsswWWW
+WwsggtttggswWWWWWwssssswWWWW
+WwsgggtgggswWWWWWWwwwwwWWWWW
+WwssgggggsswwwwwWWwwwWWWWWWW
+WWwssssssswssssswwwwwwwWWWWW
+WWWwwwwwwwwsgggsssssssswwWWW
+WWWWWWWWWWwsgtgsssgggssswWWW
+WWWWWWWWWWwsgggsgggggggsswWW
+WWWWWWWWWWwsssssggtttggsswWW
+WWWWWWWWWWWwwwsggtttttggswwW
+WWWwwwwwwwWWwwsggtttttggswwW
+WWwwssssswwWwwsggtttttggswwW
+WWwsgggggswWWwssggtttggsswWW
+WWwsgtttgswWWwssgggggggsswWW
+WwssgtttgsswWWwsssgggssswWWW
+WWwsgtttgswWWWwwssssssswwWWW
+WWwsgggggswWWWWWwwwwwwwWWWWW
+WWwwssssswwWWWWWWWwwwWWWWWWW
+WWWwwwwwwwWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWWWWWWW

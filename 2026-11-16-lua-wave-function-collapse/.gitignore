@@ -1,0 +1,5 @@
+# generated outputs (screenshot.png and collapse.gif are kept on purpose)
+*.png
+*.gif
+!screenshot.png
+!collapse.gif
