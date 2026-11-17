@@ -2,10 +2,11 @@
 
 One self-contained project every day, each in a different language, built by Claude.
 
-**Languages used so far:** C (1), C++ (1), Go (1), Haskell (1), HTML/JS (1), Java (1), Lua (1), Python (1), Ruby (1), Rust (1), TypeScript (1)
+**Languages used so far:** C (1), C++ (1), Go (1), Haskell (1), HTML/JS (1), Java (1), Lua (1), OCaml (1), Python (1), Ruby (1), Rust (1), TypeScript (1)
 
 | Date | Project | Language | What it is |
 |------|---------|----------|------------|
+| 2026-11-17 | [quorum](2026-11-17-ocaml-raft-jepsen/) | OCaml | Jepsen-style tester for Raft: deterministic simulator with partitions/crashes/buggify faults, Wing-Gong-Lowe linearizability checker (verified vs brute force on 50k histories); zero false positives on 3M ops, catches 4 injected Raft bugs incl. the paper's Figure 8 |
 | 2026-11-16 | [loom](2026-11-16-lua-wave-function-collapse/) | Lua | Wave Function Collapse texture synthesis: AC-4 constraint propagation with incremental entropy, plus its own PNG/DEFLATE and animated GIF/LZW encoders to watch the collapse; every 3x3 window of 84 test outputs verified against the sample |
 | 2026-11-15 | [qrforge](2026-11-15-cpp-qr-codec/) | C++ | Dependency-free QR encoder + decoder: optimal mixed-mode segmentation, Berlekamp-Massey/Forney Reed-Solomon repair, own PNG deflate/inflate; bit-identical to python-qrcode on 1,500 random symbols and uncovered a padding bug in segno |
 | 2026-11-14 | [Garnet](2026-11-14-ruby-sql-database/) | Ruby | SQL database from scratch: on-disk B+tree pages, crash-safe rollback journal (survives kill -9 mid-commit), query planner with index/range/hash-join access paths and EXPLAIN; matches SQLite on 143k fuzzed queries |
