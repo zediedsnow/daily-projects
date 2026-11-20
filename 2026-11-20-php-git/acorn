@@ -1,0 +1,14 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+// acorn — a git implementation in plain PHP. Repositories are real .git
+// directories: git can read what acorn writes and vice versa.
+require __DIR__ . '/src/Repo.php';
+require __DIR__ . '/src/Index.php';
+require __DIR__ . '/src/Diff.php';
+require __DIR__ . '/src/Commands.php';
+
+array_shift($argv);
+if ($argv && $argv[0] === '-C') { array_shift($argv); chdir(array_shift($argv)); }
+exit((new Acorn\Cli(getcwd()))->run($argv));
