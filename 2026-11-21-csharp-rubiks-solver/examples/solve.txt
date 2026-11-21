@@ -1,0 +1,15 @@
+tables built in 1.28s
+scramble D' R2 F' L U2 B R' D2 L' F2 U R B2 D' L2 F R2 U' B' L D F' R U2 L'
+      B B R 
+      B U R 
+      D L U 
+L U F L B F R B D B D D 
+R L D L F U F R R F B U 
+B D L U L U L U D F D U 
+      F F B 
+      F D L 
+      R R R 
+solution (20 moves): L2 B L2 D F2 L2 U' R B' U' L' U2 B L2 B U2 F2 B U2 B
+search: 79.9 ms (won by the R-L axis search), 179,917 phase-1 nodes, 718 phase-2 searches, 59,920 phase-2 nodes
+verified: applying the solution leaves the cube solved
+wrote examples/solve.svg

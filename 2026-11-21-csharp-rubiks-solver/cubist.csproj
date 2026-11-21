@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <TieredPGO>true</TieredPGO>
+    <ServerGarbageCollector>false</ServerGarbageCollector>
+    <AssemblyName>cubist</AssemblyName>
+    <RootNamespace>Cubist</RootNamespace>
+  </PropertyGroup>
+</Project>

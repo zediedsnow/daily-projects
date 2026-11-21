@@ -1,0 +1,45 @@
+group structure
+  ok    every face turn has order 4
+  ok    R U has order 105
+  ok    the sexy move R U R' U' has order 6
+  ok    R U2 D' B D' has order 1260 (the maximum element order)
+  ok    c * c^-1 = identity and random states are legal (2,000 cubes)
+famous positions
+  ok    Reid's 20-move sequence produces the superflip (every edge flipped in place)
+  ok    superflip facelet string matches Kociemba's reference
+  ok    U2 D2 F2 B2 L2 R2 gives the checkerboard pattern
+facelets
+  ok    cubie -> facelets -> cubie round-trips for 10,000 random cubes
+  ok    solved cube has the expected facelet string
+  ok    unsolvable cubes are rejected with the right reason (twisted corner / flipped edge / swapped pair)
+  ok    arbitrary colour letters are accepted (mapped by centres)
+coordinates
+  ok    twist set/get bijection (2,187)
+  ok    flip set/get bijection (2,048)
+  ok    UD-slice set/get bijection (495)
+  ok    corner permutation set/get bijection (40,320)
+  ok    U/D edge permutation set/get bijection (40,320)
+  ok    slice permutation set/get bijection (24)
+  ok    sorted-slice set/get bijection (11,880), equal to slice perm inside H
+  ok    U-edge and D-edge group set/get bijections (11,880 each)
+  ok    67-bit state key decodes back to the same cube (5,000 cubes)
+tables
+        built move + pruning tables in 1.23s
+        twist x slice          max depth 9  [0:1 1:4 2:50 3:586 4:6184 5:54066 6:296322 7:582492 8:142520 9:340]
+        flip x slice           max depth 9  [0:1 1:4 2:50 3:532 4:4804 5:41832 6:238263 7:555636 8:172314 9:324]
+        corner perm x slice    max depth 14  [0:1 1:10 2:67 3:404 4:2023 5:8504 6:28545 7:69734 8:127540 9:179700 10:189120 11:199200 12:116112 13:44416 14:2304]
+        U/D edge perm x slice  max depth 12  [0:1 1:10 2:67 3:456 4:3063 5:18202 6:86691 7:290812 8:434814 9:120488 10:11818 11:1114 12:144]
+  ok    all pruning-table entries reachable
+  ok    coordinate move tables agree with cubie-level moves (20,000 random checks)
+  ok    U-edge + D-edge groups merge into the phase-2 edge permutation (20,000 checks)
+meet-in-the-middle ball (independent of the two-phase tables)
+        enumerated 8,240,087 positions in 10.6s: 1, 18, 243, 3240, 43239, 574908, 7618438
+  ok    positions at distance 0..6 match the known counts (OEIS A080601)
+two-phase solver
+  ok    superflip solved in 20 moves (7255 ms) - superflip is known to need exactly 20
+  ok    500 uniformly random cubes all solved in <= 20 moves (longest 20, mean 31.7 ms)
+        60/60 agree; optimum distribution 1:4 2:2 3:1 4:1 5:1 6:2 7:3 8:2 10:15 11:19 12:10; 3 scrambles had a shorter solution than the scramble itself
+        mean time: two-phase (optimal mode) 36 ms, meet-in-the-middle 2785 ms
+  ok    optimal two-phase agrees with meet-in-the-middle on 60 scrambles
+
+28 passed, 0 failed in 205.1s

@@ -2,10 +2,11 @@
 
 One self-contained project every day, each in a different language, built by Claude.
 
-**Languages used so far:** C (1), C++ (1), Elixir (1), Go (1), Haskell (1), HTML/JS (1), Java (1), Lua (1), OCaml (1), PHP (1), Python (1), Ruby (1), Rust (1), TypeScript (1), Zig (1)
+**Languages used so far:** C (1), C# (1), C++ (1), Elixir (1), Go (1), Haskell (1), HTML/JS (1), Java (1), Lua (1), OCaml (1), PHP (1), Python (1), Ruby (1), Rust (1), TypeScript (1), Zig (1)
 
 | Date | Project | Language | What it is |
 |------|---------|----------|------------|
+| 2026-11-21 | [cubist](2026-11-21-csharp-rubiks-solver/) | C# | Rubik's cube solver (Kociemba two-phase): coordinate move tables, BFS pruning tables, 6 concurrent axis/inverse IDA* searches; 1,000 random cubes all solved in <=20 moves (median 17 ms), and its proven-optimal mode agrees with an independent 8.2M-position meet-in-the-middle solver on 200/200 scrambles |
 | 2026-11-20 | [acorn](2026-11-20-php-git/) | PHP | Git reimplemented from scratch: loose objects, packfiles with OFS/REF delta chains, binary index v2-v4, racy-git status, linear-space Myers diff; commit hashes, status and cat-file match real git on 42k fuzzed checks, and its diffs beat `git diff --minimal` on real code |
 | 2026-11-19 | [Horn](2026-11-19-elixir-prolog/) | Elixir | Prolog interpreter: operator-precedence parser, trail-free engine on persistent maps with exact cut/if-then-else/soft-cut/catch semantics, DCGs, yall lambdas, ~130 builtins; differential fuzzer matches SWI-Prolog on 299,995 of 300k random queries |
 | 2026-11-18 | [ludolph](2026-11-18-zig-pi-digits/) | Zig | Computes millions of digits of π, e, √2 and φ from scratch: base-10⁶ bignums, Goldilocks-prime NTT multiplication, Newton division/sqrt, threaded Chudnovsky binary splitting; 10M digits of π in 35 s, every digit identical to GMP |

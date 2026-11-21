@@ -1,0 +1,4 @@
+building meet-in-the-middle ball of radius 6...
+  8,240,087 positions in 9.6s
+        200/200 agree; optimum distribution 1:5 2:5 3:3 4:10 5:5 6:8 7:3 8:3 9:9 10:55 11:42 12:52; 4 scrambles had a shorter solution than the scramble itself
+        mean time: two-phase (optimal mode) 38 ms, meet-in-the-middle 2805 ms

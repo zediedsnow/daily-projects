@@ -1,0 +1,11 @@
+tables built in 1.23s; solving 1000 uniformly random cubes (target <= 20 moves)
+verified: 1000/1000 solutions solve their cube
+length distribution:
+  15 moves:     1  #
+  16 moves:     1  #
+  17 moves:    11  #
+  18 moves:    39  ##
+  19 moves:   245  ##############
+  20 moves:   703  ##########################################
+mean length 19.64 moves
+time per cube: median 17.07 ms, mean 40.48 ms, p99 332.92 ms, max 2829.87 ms
