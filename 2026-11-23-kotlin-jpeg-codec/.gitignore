@@ -1,0 +1,4 @@
+ochre.jar
+*.class
+__pycache__/
+/out/
