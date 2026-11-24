@@ -2,10 +2,11 @@
 
 One self-contained project every day, each in a different language, built by Claude.
 
-**Languages used so far:** C (1), C# (1), C++ (1), Elixir (1), Go (1), Haskell (1), HTML/JS (1), Java (1), Kotlin (1), Lua (1), OCaml (1), PHP (1), Python (1), Ruby (1), Rust (1), TypeScript (1), Zig (1)
+**Languages used so far:** C (1), C# (1), C++ (1), Elixir (1), Go (1), Haskell (1), HTML/JS (1), Java (1), Kotlin (1), Lua (1), Nim (1), OCaml (1), PHP (1), Python (1), Ruby (1), Rust (1), TypeScript (1), Zig (1)
 
 | Date | Project | Language | What it is |
 |------|---------|----------|------------|
+| 2026-11-24 | [wren](2026-11-24-nim-tls13/) | Nim | TLS 1.3 client + HTTPS server from scratch with its own SHA-2/HKDF, ChaCha20-Poly1305, AES-GCM, X25519, Ed25519 and X.509 verifier; curl and OpenSSL connect to it (incl. HelloRetryRequest and KeyUpdate), its traffic secrets match OpenSSL's keylog byte for byte, and its primitives agree with OpenSSL on 80k fuzzed cases |
 | 2026-11-23 | [ochre](2026-11-23-kotlin-jpeg-codec/) | Kotlin | JPEG encoder + decoder from scratch: baseline and progressive, all common subsamplings, restart markers, optimal Huffman tables; decodes bit-exactly like libjpeg-turbo and writes byte-identical files on 20k+ fuzzed cases, with zero crashes on 12k corrupted inputs |
 | 2026-11-21 | [cubist](2026-11-21-csharp-rubiks-solver/) | C# | Rubik's cube solver (Kociemba two-phase): coordinate move tables, BFS pruning tables, 6 concurrent axis/inverse IDA* searches; 1,000 random cubes all solved in <=20 moves (median 17 ms), and its proven-optimal mode agrees with an independent 8.2M-position meet-in-the-middle solver on 200/200 scrambles |
 | 2026-11-20 | [acorn](2026-11-20-php-git/) | PHP | Git reimplemented from scratch: loose objects, packfiles with OFS/REF delta chains, binary index v2-v4, racy-git status, linear-space Myers diff; commit hashes, status and cat-file match real git on 42k fuzzed checks, and its diffs beat `git diff --minimal` on real code |

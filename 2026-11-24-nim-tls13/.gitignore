@@ -1,0 +1,8 @@
+wren
+tests/vectors
+tests/oracle
+nimcache/
+# demo keys/certs are generated locally by demo/mkcerts.sh
+demo/*.pem
+demo/*.key
+*.keys
