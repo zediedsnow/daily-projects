@@ -1,0 +1,10 @@
+nutmeg NUTS fit of 'logistic regression': 4 chains x 1000 draws, 3 params
+step sizes 0.786, 0.742, 0.737, 0.74 | mean tree depth 2.17 | 18916 leapfrogs | divergences 0 | 18.5s sampling CPU
+   param   mean    sd     q5    q50    q95    mcse rhat ess_bulk ess_tail
+ beta[1] -1.120 0.166 -1.400 -1.110 -0.851 0.00328    1     2590     2800
+ beta[2]  0.695 0.171  0.412  0.695  0.981 0.00325    1     2760     2750
+ beta[3]  1.400 0.186  1.110  1.400  1.720 0.00376    1     2440     2810
+
+glm() maximum likelihood for comparison:
+     X   Xage  Xdose 
+-1.105  0.684  1.384 

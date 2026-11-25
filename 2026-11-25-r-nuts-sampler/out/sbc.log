@@ -1,0 +1,5 @@
+SBC: 200 replications x 3 parameters (808s)
+  mu     rank histogram 12 5 11 8 5 15 10 8 10 12 13 10 6 11 7 11 11 14 10 11  chi2(19) =  14.6, p = 0.748
+  sigma  rank histogram 10 13 10 5 11 13 10 8 6 13 5 11 4 11 14 13 10 8 8 17  chi2(19) =  21.8, p = 0.294
+  w      rank histogram 12 11 4 10 12 14 7 6 12 10 7 12 11 10 12 7 11 14 7 11  chi2(19) =  14.4, p = 0.760
+SBC: ranks consistent with uniform for every parameter

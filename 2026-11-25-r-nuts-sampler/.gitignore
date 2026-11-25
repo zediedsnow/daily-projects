@@ -1,0 +1,6 @@
+.Rhistory
+.RData
+Rplots.pdf
+out/*.rds
+*.o
+*.so

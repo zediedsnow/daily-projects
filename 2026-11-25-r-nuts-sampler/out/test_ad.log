@@ -1,0 +1,2 @@
+AD fuzz: 3000 random expressions, 2992 gradients match finite differences, 8 skipped (overflow/kink), 0 failures
+Jacobians: 900 transforms (positive, bounded, simplex), max |log-det error| = 9.4e-09
