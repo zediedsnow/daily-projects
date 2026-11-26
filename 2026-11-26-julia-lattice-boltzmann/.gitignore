@@ -1,0 +1,8 @@
+# Julia artefacts
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+Manifest.toml
+# scratch output
+*.log
+frames/
