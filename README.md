@@ -2,10 +2,11 @@
 
 One self-contained project every day, each in a different language, built by Claude.
 
-**Languages used so far:** C (1), C# (1), C++ (1), Elixir (1), Go (1), Haskell (1), HTML/JS (1), Java (1), Julia (1), Kotlin (1), Lua (1), Nim (1), OCaml (1), PHP (1), Python (1), R (1), Ruby (1), Rust (1), Scala (1), TypeScript (1), Zig (1)
+**Languages used so far:** C (1), C# (1), C++ (1), Elixir (1), Go (1), Haskell (1), HTML/JS (1), Java (1), Julia (1), Kotlin (1), Lua (1), Nim (1), OCaml (1), PHP (1), Python (1), R (1), Ruby (1), Rust (1), Scala (1), SQL (1), TypeScript (1), Zig (1)
 
 | Date | Project | Language | What it is |
 |------|---------|----------|------------|
+| 2026-11-28 | [umbra](2026-11-28-sql-raymarcher/) | SQL | Ray marcher + PNG encoder in pure PostgreSQL SQL (no PL/pgSQL): every ray is a row and the whole image sphere-traces in lock-step through recursive CTEs, with soft shadows, AO and two-bounce Fresnel reflections; PNG filters, LZ77, fixed-Huffman DEFLATE bit-packing and CRC-32 are all set-based queries; the SDF passes a 50k-pair Lipschitz test and the encoder matches zlib/Pillow on 830+ cases |
 | 2026-11-27 | [saturn](2026-11-27-scala-egraph-eqsat/) | Scala | E-graph equality saturation engine from scratch: hashcons + union-find with egg-style deferred congruence rebuilding, constant-folding e-class analysis, e-matching, backoff scheduler and cost-based extraction; simplifies and strength-reduces integer expressions, proves identities like (x+1)³ expansion, matches a naive congruence-closure oracle on 478k term pairs, audits 1.5M e-nodes for soundness and catches every injected bogus rule |
 | 2026-11-26 | [karman](2026-11-26-julia-lattice-boltzmann/) | Julia | Lattice-Boltzmann CFD solver with zero packages: TRT collision, Bouzidi curved-wall bounce-back, momentum-exchange forces, fused threaded kernel and its own PNG/GIF encoders; reproduces the Schäfer–Turek cylinder benchmark (drag within 0.04% at Re = 20, Strouhal 0.3004 at Re = 100), exact Poiseuille flow and 2nd-order Taylor–Green convergence |
 | 2026-11-25 | [nutmeg](2026-11-25-r-nuts-sampler/) | R | No-U-Turn Sampler from scratch in base R: its own vectorised reverse-mode autodiff on R's operator generics, Stan-style multinomial NUTS with windowed metric adaptation, and R-hat/bulk/tail-ESS diagnostics; agrees with Stan on 24 parameters across 3 models, passes simulation-based calibration, and its diagnostics match the `posterior` package to 1e-14 |
